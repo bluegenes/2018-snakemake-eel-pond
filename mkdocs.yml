@@ -1,0 +1,54 @@
+site_name: eelpond
+site_url: http://dib-lab.github.io/eelpond/
+repo_name: eelpond
+repo_url: https://github.com/dib-lab/eelpond
+edit_url: ""
+
+extra_css: css/custom.css
+
+copyright: 'Copyright &copy; 2018 <a href="http://ivory.idyll.org/lab/">Lab for Data Intensive Biology</a> at UC Davis'
+
+# change directory names here
+docs_dir: docs
+site_dir: site
+
+theme:
+
+  # the next 2 lines are required to use the DIB version
+  name: null
+  custom_dir: 'mkdocs-material-dib/material'
+
+  # pretty colors! see https://squidfunk.github.io/mkdocs-material/getting-started/#primary-colors
+  palette:
+    primary: 'purple'
+    accent: 'purple'
+  
+  # fun logos! see https://material.io/icons/
+  logo:
+    icon: 'dns'
+
+  font:
+    text: 'Roboto'
+    code: 'Roboto Mono'
+
+# this will add docs/css/custom.css to all your docs
+extra_css:
+  - css/custom.css
+
+# give a title for each page
+pages:
+  - 'Index' : 'index.md'
+  - 'Read Quality Trimming and Filtering' : 'QC.md'
+  - 'Digital Normalization' : 'Diginorm.md'
+  - 'Assembly' : 'Assembly.md'
+  - 'Quality Assessment': 'Quality.md'
+  - 'Transcript Quantification' : 'Quant.md'
+  - 'Differential Expression' : 'DE.md'
+
+# Extensions
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
