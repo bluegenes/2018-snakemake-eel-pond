@@ -1,37 +1,35 @@
 from os import path
 from trinity_targets import get_trimmed_trinity_input
+from trinity_targets import get_khmer_trimmed_trinity_input
 
 #include: "trinity_config.yaml"
 
 all_trimmed = get_trimmed_trinity_input(units, base, TRIM_DIR)
 LEFT = [x for x in all_trimmed if '_1.trim' in x]
 RIGHT= [x for x in all_trimmed if '_2.trim' in x]
-SINGLE= [x for x in all_trimmed if 'se.trim' in x]
-LEFT = LEFT + SINGLE
+SINGLE= [x for x in all_trimmed if 'se' in x]
 
-def get_trimmed(wildcards):
-    readsD = {} # note that this is missing the orphans from paired samples
-    if not is_single_end(**wildcards):
-        # paired-end sample
-        readsD['left'] = expand(join(TRIM_DIR, '{sample}_{unit}_1.trim.fq.gz'),**wildcards)
-        readsD['right'] = expand(join(TRIM_DIR, '{sample}_{unit}_2.trim.fq.gz'),**wildcards)
-    else:# single end sample
-        se = expand(join(TRIM_DIR, '{sample}_{unit}_se.trim.fq.gz'),**wildcards)
-        readsD['left'] = readsD['left'] + se
-    return readsD
+#khmer_trimmed = get_khmer_trimmed_trinity_input(units, base, KHMER_TRIM_DIR)
+#LEFT = [x for x in khmer_trimmed if 'paired.1' in x]
+#RIGHT= [x for x in khmer_trimmed if 'paired.2' in x]
+#SINGLE= [x for x in khmer_trimmed if any(['se' in x, 'single' in x])]
+LEFT = LEFT + SINGLE
 
 rule trinity:
     input:
+#try something like this: quant = expand(join(QUANT_DIR,"{unit.sample}_{unit.unit}" + base, "quant.sf"), unit=units.itertuples())
         #unpack(get_trimmed)
         left=LEFT,
         right=RIGHT
     output:
-        fasta = join(ASSEMBLY_DIR,"trinity_out_dir/Trinity.fasta")
+        fasta = join(ASSEMBLY_DIR,"trinity_out_dir/Trinity.fasta"),
+        gene_trans_map = join(ASSEMBLY_DIR,"trinity_out_dir/Trinity.fasta.gene_trans_map"),
     message:
         """--- Assembling read data with Trinity v2.5.1 --- """
     params:
         #**config['trinity']
         # optional parameters
+        seqtype='fq',
         extra=""
     threads: 4
     log: join(LOGS_DIR, 'trinity/trinity.log')
@@ -42,6 +40,12 @@ rule rename_trinity_fasta:
     input: rules.trinity.output.fasta
     output: join(ASSEMBLY_DIR, base + '.fasta')
     log: join(LOGS_DIR, 'trinity/cp_assembly.log')
+    shell: ("cp {input} {output}") 
+
+rule rename_trinity_gene_trans_map:
+    input: rules.trinity.output.gene_trans_map
+    output: join(ASSEMBLY_DIR, base + '.fasta.gene_trans_map')
+    log: join(LOGS_DIR, 'trinity/cp_gt_map.log')
     shell: ("cp {input} {output}") 
 
 
